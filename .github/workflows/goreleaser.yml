@@ -12,6 +12,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
 
     steps:
       -
@@ -19,6 +21,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       -
         name: Set up Go
@@ -45,3 +53,7 @@ jobs:
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      -
+        name: Clear
+        run: rm -f ${HOME}/.docker/config.json
