@@ -1,0 +1,10 @@
+/clean-dir-on-request
+
+Dockerfile
+
+.git
+.gitignore
+
+LICENSE
+
+*.md

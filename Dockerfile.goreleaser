@@ -1,0 +1,3 @@
+FROM scratch
+ENTRYPOINT ["/clean-dir-on-request"]
+COPY clean-dir-on-request /
