@@ -35,14 +35,14 @@ dockers:
     - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-arm64v8
     dockerfile: Dockerfile.goreleaser
     goarch: amd64
-    use_buildx: true
+    use: buildx
     build_flag_templates:
     - --platform=linux/amd64
   - image_templates:
     - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-arm64v8
     dockerfile: Dockerfile.goreleaser
     goarch: arm64
-    use_buildx: true
+    use: buildx
     build_flag_templates:
     - --platform=linux/arm64/v8
 release:
