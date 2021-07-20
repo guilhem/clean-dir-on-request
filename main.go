@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 )
 
-var port string
+var address string
 var dir string
 
 func init() {
-	flag.StringVar(&port, "p", "8080", "Port for the server to run on.")
+	flag.StringVar(&address, "a", ":8080", "Address for the server to run on.")
 	flag.StringVar(&dir, "d", "", "Path to delete.")
 }
 
@@ -25,9 +25,9 @@ func main() {
 
 	http.HandleFunc("/", clean)
 
-	log.Printf("Serve on port %v", port)
+	log.Printf("Serve on address %s", address)
 
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	if err := http.ListenAndServe(address, nil); err != nil {
 		log.Panicf("ListenAndServe: %v", err)
 	}
 }
