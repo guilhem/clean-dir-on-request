@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 )
 
 var address string
@@ -23,13 +26,35 @@ func main() {
 		log.Panic("directory not set")
 	}
 
-	http.HandleFunc("/", clean)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", clean)
+
+	srv := http.Server{
+		Addr:    address,
+		Handler: mux,
+	}
+
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
+		<-sigint
+
+		// We received an interrupt signal, shut down.
+		if err := srv.Shutdown(context.Background()); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Printf("HTTP server Shutdown: %v", err)
+		}
+		close(idleConnsClosed)
+	}()
 
 	log.Printf("Serve on address %s", address)
 
 	if err := http.ListenAndServe(address, nil); err != nil {
 		log.Panicf("ListenAndServe: %v", err)
 	}
+
+	<-idleConnsClosed
 }
 
 func clean(w http.ResponseWriter, r *http.Request) {
