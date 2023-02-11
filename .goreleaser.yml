@@ -13,6 +13,9 @@ builds:
       - linux
       - windows
       - darwin
+    ignore:
+      - goos: windows
+        goarch: arm64
 archives:
   - replacements:
       darwin: Darwin
@@ -21,35 +24,35 @@ archives:
       386: i386
       amd64: x86_64
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
 
 dockers:
   - image_templates:
-    - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-amd64
+      - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-amd64
     dockerfile: Dockerfile.goreleaser
     goarch: amd64
     use: buildx
     build_flag_templates:
-    - --platform=linux/amd64
+      - --platform=linux/amd64
   - image_templates:
-    - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-arm64v8
+      - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-arm64v8
     dockerfile: Dockerfile.goreleaser
     goarch: arm64
     use: buildx
     build_flag_templates:
-    - --platform=linux/arm64/v8
+      - --platform=linux/arm64/v8
 docker_manifests:
-- name_template: ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}
-  image_templates:
-  - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-amd64
-  - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-arm64v8
+  - name_template: ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}
+    image_templates:
+      - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-amd64
+      - ghcr.io/guilhem/clean-dir-on-request:{{ .Version }}-arm64v8
 
 release:
