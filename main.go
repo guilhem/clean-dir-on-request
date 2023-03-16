@@ -35,13 +35,14 @@ func main() {
 	}
 
 	idleConnsClosed := make(chan struct{})
+	ctx := context.Background()
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+
 	go func() {
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
-		<-sigint
+		<-ctx.Done()
 
 		// We received an interrupt signal, shut down.
-		if err := srv.Shutdown(context.Background()); err != nil {
+		if err := srv.Shutdown(ctx); err != nil {
 			// Error from closing listeners, or context timeout:
 			log.Printf("HTTP server Shutdown: %v", err)
 		}
@@ -50,8 +51,9 @@ func main() {
 
 	log.Printf("Serve on address %s", address)
 
-	if err := http.ListenAndServe(address, nil); err != nil {
-		log.Panicf("ListenAndServe: %v", err)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Printf("ListenAndServe: %v", err)
+		cancel()
 	}
 
 	<-idleConnsClosed
